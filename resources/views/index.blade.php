@@ -292,7 +292,8 @@ ob_start();
             <div class="right">
                 <div id="form">
                     <i class="fas fa-user"></i>
-                    <form method="post">
+                    <form method="post" action="{{route('login.store')}}">
+                        @csrf
                         <div class="form-group">
                             <label for="matric">Matriculation Number:</label>
                             <input type="text" placeholder="Matric Number" name="matric">

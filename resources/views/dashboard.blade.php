@@ -57,7 +57,12 @@
         <div class="user-container d-flex">
           <div class="d-flex user position-relative" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <img class="profile" alt="profile" src="img/profile-11.webp" />
-            <div class="name">Applicant Name</div>
+            <div class="name">{{ session('user')->Surname }} {{ session('user')->Other_names }}
+              <div class="card-body h-100">
+                {{-- <h1>Welcome </h1> --}}
+                <p>{{ session('user')->email }}</p>
+              </div>
+            </div>
           </div>
           <div class="dropdown-menu dropdown-menu-end user-menu wide">
 
@@ -185,7 +190,10 @@
 
         <!-- Nav Item - User Information -->
         <li class="nav-item dropdown no-arrow">
-          <form method="post" class=" nav-link"><button class="trash logout" type="submit" name="logout"><i class="fas fa-sign-out-alt"></i>Logout</button></form>
+          <form method="post" action="{{ route('logout') }}" class=" nav-link"><button class="trash logout" type="submit" name="logout"><i class="fas fa-sign-out-alt"></i>Logout</button></form>
+            @csrf 
+            
+        
 
         </li>
 
@@ -216,7 +224,7 @@
         <!-- Content Start -->
         <div class="card mb-2">
           <div class="card-body h-100">
-            Welcome
+            Welcome <h1>{{ session('user')->Surname }} {{ session('user')->Other_names }}</h1>
           </div>
         </div>
         <!-- Content End -->
