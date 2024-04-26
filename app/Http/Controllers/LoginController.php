@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Authenticate;
-use App\Models\Login;
 use App\Models\NewStudent;
-use Illuminate\Http\Request;
 use App\Models\PrevApp;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -16,15 +18,6 @@ class LoginController extends Controller
     public function index()
     {
         return view('index');
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -35,61 +28,35 @@ class LoginController extends Controller
         $matric = $request->input('matric');
         $password = $request->input('password');
 
-        // Authenticate the user
-        $authenticate = Authenticate::where('matric', $matric)->where('password', $password)->first();
+        $authenticate = User::where('matric', $matric)->first();
 
         if ($authenticate) {
-            // Retrieve the user from the 'prev_app' table using the matric
             $prevApp = PrevApp::where('matric', $matric)->first();
 
             if ($prevApp) {
-                // Retrieve the user's information from the 'new_student' table using the user_id from 'prev_app'
                 $user = NewStudent::find($prevApp->user_id);
-                
-                // Store the user's information in the session
-                session(['user' => $user]);
 
-                return redirect()->route('dashboard');
+                if (Auth::attempt($request->only(['matric', 'password']))) {
+                    Session::put('user', $user);
+                    return redirect()->route('dashboard');
+                }
+
+                return back()->withErrors(['message' => 'User not found'])->withInput();
             } else {
-                return back()->withErrors(['message' => 'User not found']);
+                return back()->withErrors(['message' => 'User not found'])->withInput();
             }
         } else {
-            return back()->withErrors(['message' => 'Invalid matric number or password']);
+            return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
         }
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function show(Login $login)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Login $login)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Login $login)
-    {
-        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Login $login)
+    public function destroy()
     {
-        session()->forget('authenticated_matric');
-        return redirect()->route('login.index');
+        Auth::logout();
+        Session::forget('user');
+        return redirect()->route('login');
     }
 }
-
-
-

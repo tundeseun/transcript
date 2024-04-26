@@ -10,5 +10,7 @@ use Illuminate\Foundation\Auth\User as AuthenticatableUser;
 class User extends AuthenticatableUser implements Authenticatable
 {
     use HasFactory;
+
+    protected $table = 'authenticate';
 }
 
