@@ -109,12 +109,13 @@
                         </li>
 
                         <li>
-                            <a href="#pages" data-href="#">
-                                <i data-acorn-icon="notebook-1" class="icon" data-acorn-size="18"></i>
-                                <span class="label">Pages</span>
+                            <a href="{{ route('dashboard.cart') }}" data-href="#">
+                                <i class="fas fa-cart-arrow-down" style="font-size: 18px;"></i>
+                                <span class="label">Cart ({{ session('totalItems', 0) }})</span>
                             </a>
-
                         </li>
+                        
+
                         <li>
                             <a href="#blocks" data-href="#">
                                 <i data-acorn-icon="grid-5" class="icon" data-acorn-size="18"></i>
@@ -192,8 +193,19 @@
 
                 <!-- Nav Item - User Information -->
                 <li class="nav-item dropdown no-arrow">
+
                     <form method="post" action="{{ route('logout') }}" class="nav-link">
                         @csrf
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class='fas fa-cart-plus'
+                                style='font-size:px;color:white, background-color: darkblue'></i>
+                            <span class="label">Cart ({{ session('totalItems', 0) }})</span>
+
+                        </a>
+
+
+
+
                         <button class="trash logout" type="submit" name="logout">
                             <i class="fas fa-sign-out-alt"></i>Logout
                         </button>
@@ -212,7 +224,7 @@
             {{ $slot }}
         </main>
 
-        <!-- Footer Start -->
+        <!-- Footer Start -->       
         {{-- <footer class="footer">
             <div class="container-fluid">
                 <div class="row">

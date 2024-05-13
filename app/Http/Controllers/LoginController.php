@@ -23,32 +23,42 @@ class LoginController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $matric = $request->input('matric');
-        $password = $request->input('password');
+    /**
+ * Store a newly created resource in storage.
+ */
+public function store(Request $request)
+{
+    $matric = $request->input('matric');
+    $password = $request->input('password');
 
-        $authenticate = User::where('matric', $matric)->first();
+    $authenticate = User::where('matric', $matric)->first();
 
-        if ($authenticate) {
-            $prevApp = PrevApp::where('matric', $matric)->first();
+    if ($authenticate) {
+        $prevApp = PrevApp::where('matric', $matric)->first();
 
-            if ($prevApp) {
-                $user = NewStudent::find($prevApp->user_id);
+        if ($prevApp) {
+            $user = NewStudent::find($prevApp->user_id);
 
-                if (Auth::attempt($request->only(['matric', 'password']))) {
-                    Session::put('user', $user);
-                    return redirect()->route('dashboard');
-                }
-
-                return back()->withErrors(['message' => 'User not found'])->withInput();
-            } else {
-                return back()->withErrors(['message' => 'User not found'])->withInput();
+            if (Auth::attempt($request->only(['matric', 'password']))) {
+                Session::put('user', $user);
+                Session::put('matric', $matric); 
+                return redirect()->route('dashboard');
             }
+
+            return back()->withErrors(['message' => 'User not found'])->withInput();
         } else {
-            return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
+            return back()->withErrors(['message' => 'User not found'])->withInput();
         }
+    } else {
+        return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
     }
+}
+
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    
 
     /**
      * Remove the specified resource from storage.

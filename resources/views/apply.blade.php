@@ -1,3 +1,9 @@
+@php
+    $notify = DB::table('notify')
+        ->where('matric', session('user')->matric)
+        ->first();
+@endphp
+
 <x-app-layout :pageName="'Apply'">
     <div class="container">
         <!-- Title and Top Buttons Start -->
@@ -24,7 +30,9 @@
             <div class="card-body h-100 w-100">
                 <h1 class="mb-0 pb-0 display-4" id="title">Transcript Request</h1>
                 <nav class="breadcrumb-container w-100 d-inline-block" aria-label="breadcrumb">
-                    <form action="{{ route('dashboard.create') }}" method="POST">
+                    <form id="transcriptForm"
+                        action="{{ $notify ? route('dashboard.apply') : route('dashboard.create') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <h2 class="mt-4">Please provide details of your Transcript request and add to cart</h2>
                         <div class="mt-10 col-md-12">
@@ -62,7 +70,7 @@
                                     <label for="department">Department</label>
                                     <select id="department" class="form-control" name="department">
                                         <option value="">Select Department</option>
-                                        @if (isset($facultyId))
+                                        @if ($notify && isset($facultyId))
                                             @foreach ($deptData[$facultyId] as $deptId => $department)
                                                 <option value="{{ $deptId }}">{{ $department }}</option>
                                             @endforeach
@@ -73,7 +81,7 @@
                                     <label for="degree">Degree</label>
                                     <select id="degree" class="form-control" name="degree">
                                         <option value="">Select Degree</option>
-                                        @if (isset($facultyId))
+                                        @if ($notify && isset($facultyId))
                                             @foreach ($degreeData[$facultyId] as $degreeId => $degree)
                                                 <option value="{{ $degreeId }}">{{ $degree }}</option>
                                             @endforeach
@@ -88,7 +96,7 @@
                                     <label for="field">Specialization</label>
                                     <select id="field" class="form-control" name="field">
                                         <option value="">Select Specialization</option>
-                                        @if (isset($facultyId))
+                                        @if ($notify && isset($facultyId))
                                             @foreach ($fieldData[$facultyId] as $fieldId => $field)
                                                 <option value="{{ $fieldId }}">{{ $field }}</option>
                                             @endforeach
@@ -114,9 +122,9 @@
                                     <label for="transcript_type">Transcript Type</label>
                                     <select id="transcript_type" class="form-control" name="transcript_type">
                                         <option value="">Select Transcript Type</option> <!-- Default option -->
-                                        @foreach ($requestTypes as $requestTypes)
-                                            <option value="{{ $requestTypes->type_id }}">
-                                                {{ $requestTypes->requesttype }}
+                                        @foreach ($requestTypes as $requestType)
+                                            <option value="{{ $requestType->type_id }}">
+                                                {{ $requestType->requesttype }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -132,18 +140,13 @@
                                         <option value="5">Five (5)</option>
                                     </select>
                                 </div>
-                              
+
                             </div>
 
                             <div class="mt-4">
                                 <div class="col form-group">
                                     <label for="file"><strong>Please Upload Notification of Result or
                                             Certificate</strong></label>
-                                    @php
-                                        $notify = DB::table('notify')
-                                            ->where('matric', session('user')->matric)
-                                            ->first();
-                                    @endphp
                                     @if ($notify)
                                         <input type="text" class="form-control"
                                             value="{{ $notify->Notification_Document }}" readonly>
@@ -154,37 +157,13 @@
                                 </div>
 
                             </div>
-                            <form action="{{ $notify ? route('dashboard.apply') : route('dashboard.create') }}"
-                                method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @if ($notify)
-                                    <input type="hidden" name="file"
-                                        value="{{ $notify->Notification_Document }}">
-                                @else
-                                    {{-- <div class="form-group">
-                                        <label for="file"><strong>Please Upload Notification of Result or
-                                                Certificate</strong></label>
-                                        <input type="file" id="file" name="file" required
-                                            class="form-control">
-                                    </div> --}}
-                                @endif
-                                <button class="btn btn-primary" type="submit">Add to Cart</button>
-
-
-
-                            {{-- <div class="mt-4">
-                                <button class="btn btn-primary" type="submit">Add to Cart</button>
-                            </div> --}}
+                            <button class="btn btn-primary" type="submit" id="addToCart">Add to Cart</button>
+                        </div>
                     </form>
                 </nav>
             </div>
         </div>
     </div>
-
-
-
-
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
@@ -202,7 +181,7 @@
                         success: function(data) {
                             $('#department').empty();
                             $('#degree').empty();
-                            $('#specialization').empty();
+                            $('#field').empty();
                             $('#department').append(
                                 '<option value="">Select Department</option>');
                             $.each(data, function(key, value) {
@@ -214,7 +193,7 @@
                 } else {
                     $('#department').empty();
                     $('#degree').empty();
-                    $('#specialization').empty();
+                    $('#field').empty();
                 }
             });
 
@@ -230,7 +209,7 @@
                         dataType: 'json',
                         success: function(data) {
                             $('#degree').empty();
-                            $('#specialization').empty();
+                            $('#field').empty();
                             $('#degree').append('<option value="">Select Degree</option>');
                             $.each(data, function(key, value) {
                                 $('#degree').append('<option value="' + value.id +
@@ -240,7 +219,7 @@
                     });
                 } else {
                     $('#degree').empty();
-                    $('#specialization').empty();
+                    $('#field').empty();
                 }
             });
 
@@ -255,18 +234,38 @@
                         },
                         dataType: 'json',
                         success: function(data) {
-                            $('#specialization').empty();
-                            $('#specialization').append(
+                            $('#field').empty();
+                            $('#field').append(
                                 '<option value="">Select Specialization</option>');
                             $.each(data, function(key, value) {
-                                $('#specialization').append('<option value="' + value
-                                    .id + '">' + value.name + '</option>');
+                                $('#field').append('<option value="' + value.id + '">' +
+                                    value.name + '</option>');
                             });
                         }
                     });
                 } else {
-                    $('#specialization').empty();
+                    $('#field').empty();
                 }
+            });
+
+            // Submit form using AJAX
+            $('#transcriptForm').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) {
+                        window.location.href = "{{ route('dashboard.cart') }}";
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
             });
         });
     </script>

@@ -298,7 +298,7 @@
                     <div class="card-body h-100 w-100">
                         <h1 class="mb-0 pb-0 display-4" id="title">Transcript Request</h1>
                         <nav class="breadcrumb-container w-100 d-inline-block" aria-label="breadcrumb">
-                            <form action="{{ route('dashboard.apply') }}" method="POST">
+                            <form method="post" action="{{ route('dashboard.store') }}" enctype="multipart/form-data">
                                 @csrf
                                 <h2 class="mt-4">Please provide details of your Transcript request and add to cart
                                 </h2>
@@ -307,11 +307,11 @@
                                     <div class="row ">
                                         <div class="col form-group">
                                             <label for="transcript_type">Transcript Type</label>
-                                            <select id="transcript_type" class="form-control" name="transcript_type">
+                                            <select id="transcript_type" class="form-control" name="transcript_type"
+                                                required>
                                                 <option value="">Select Transcript Type</option>
-                                                @foreach ($requestTypes as $requestTypes)
-                                                    <option value="{{ $requestTypes->type_id }}">
-                                                        {{ $requestTypes->requesttype }}
+                                                @foreach ($requestTypes as $type)
+                                                    <option value="{{ $type->type_id }}">{{ $type->requesttype }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -320,7 +320,8 @@
 
                                         <div class="col form-group">
                                             <label for="number_of_copies">Number of Copies</label>
-                                            <select id="number_of_copies" name="number_of_copies" class="form-control">
+                                            <select id="number_of_copies" name="number_of_copies" class="form-control"
+                                                required>
                                                 <option value="">Select Number of Copies</option>
                                                 <option value="1">One (1)</option>
                                                 <option value="2">Two (2)</option>

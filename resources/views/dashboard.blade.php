@@ -16,7 +16,8 @@
         <!-- Content Start -->
         <div class="card mb-2">
             <div class="card-body h-100">
-                Welcome <h1> {{ session('user')->id }}{{ session('user')->Surname }} {{ session('user')->Other_names }}</h1>
+                Welcome <h1> {{ session('user')->id }}{{ session('user')->Surname }} {{ session('user')->Other_names }}
+                </h1>
             </div>
         </div>
         <!-- Content End -->
@@ -38,21 +39,13 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($users as $index => $user)
                                 <tr>
-                                    <td colspan="6">Matric: {{ session('user')->matric }}</td>
-                                </tr>
-                                <?php
-                                $user_ids = DB::table('prev_app')->where('matric', session('user')->matric)->pluck('user_id');
-                                $data = DB::table('zmain_app')->whereIn('user_id', $user_ids)->get();
-                                ?>
-                                @foreach ($data as $index => $row)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $row->faculty }}</td>
-                                        <td>{{ $row->department }}</td>
-                                        <td>{{ $row->degree }}</td>
-                                        <td>{{ $row->field_of_interest }}</td>
-                                        <td>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $user->faculty_name }}</td>
+                                    <td>{{ $user->department_name }}</td>
+                                    <td>{{ $user->degree_name }}</td>
+                                    <td>{{ $user->specialization_name }}</td>                                        <td>
                                             <a href="{{ route('dashboard.apply') }}" class="btn btn-info">Apply</a>
                                         </td>
                                     </tr>
@@ -60,18 +53,10 @@
                             </tbody>
                         </table>
                         
-                        
-                        
-                    
-                    </div>
                 </nav>
             </div>
             </table>
         </div>
+    </div>
 
-
-        </nav>
-    </div>
-    </div>
-    </div>
 </x-app-layout>
