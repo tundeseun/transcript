@@ -1,7 +1,3 @@
-<?php
-ob_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,20 +5,41 @@ ob_start();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="img/favicon/favicon-196x196.png" sizes="196x196" />
-    <link rel="icon" type="image/png" href="img/favicon/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/png" href="img/favicon/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="img/favicon/favicon-16x16.png" sizes="16x16" />
-    <link rel="icon" type="image/png" href="img/favicon/favicon-128.png" sizes="128x128" />
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon/favicon-196x196.png') }}" sizes="196x196" />
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon/favicon-128.png') }}" sizes="128x128" />
     <script src="https://kit.fontawesome.com/ba46c9c7c0.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <link rel="icon" href="logo.png" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ asset('bootstrap.min.css') }}">
+    <link rel="icon" href="{{ asset('logo.png') }}" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet" />
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+         /* The main section should grow to fill available space */
+         section {
+            flex-grow: 1;
+        }
+
+        /* Ensure the footer stays at the bottom */
+        footer {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+        }
+       
         .form-control {
             margin-bottom: 20px;
             }
@@ -245,98 +262,30 @@ ob_start();
 
         }
     </style>
-    <link rel="stylesheet" href="style.css">
-    <title>Transcript Application | Sign In Page</title>
+    <link rel="stylesheet" href="{{ asset('style.css') }}">
+    <title>{{ $title ?? 'Transcript Application | Login Page' }}</title>
 </head>
 
 <body>
     <nav id="navchecker">
         <div class="mr">
-            <img style="width:50px" src="img/ui-logo.png" class="logo">
+            <img style="width:50px" src="{{ asset('img/ui-logo.png') }}" class="logo">
         </div>
-
         <div>
-            <h1 class="h3 m-0 font-weight-100 text-primary" style="">University of
-                Ibadan,<br>The&nbsp;Postgraduate&nbsp;College</h1>
-
+            <h1 class="h3 m-0 font-weight-100 text-primary">University of Ibadan,<br>The&nbsp;Postgraduate&nbsp;College</h1>
         </div>
         <div class="ml">
-            <img style="width:50px" src="img/logo.png" class="logo">
+            <img style="width:50px" src="{{ asset('img/logo.png') }}" class="logo">
         </div>
-
-
-
-
-
     </nav>
+
     <section>
-
-        <div class="box lr">
-
-            <div class="left">
-                <div class="">
-                    <p class="display-2 text-bold text-primary head">Transcript Application</p>
-                </div>
-                <h1 class="bold">Read the following guidelines carefully before commencing a transcript application:
-                </h1>
-                <ul class="mb-1">
-                    <li>
-
-                        Institutional (not personal/ individual) email address is to be submitted for official
-                        transcripts.
-
-                    </li>
-                    <li>
-
-                        Application and payment should only be made via tps.oauife.edu.ng. Payment of cash to any
-                        individual, company or agent is prohibited.
-
-                    </li>
-                    <li>
-
-                        Transcripts that are requested for personally will be marked "Student Copy"
-
-                    </li>
-                    <li>
-
-                        All details are to be filled in correctly.
-
-                    </li>
-                </ul>
-                <p>
-
-                    For further enquires, kindly contact us using the following avenues:
-                </p>
-                <p>
-                    Email address: transcript@pgcollege.edu.ng
-                </p>
-
-
-            </div>
-            <div>
-                @if (session()->has('success'))
-                    <div>
-                        {{ session('success') }}
-                    </div>
-                @endif
-            </div>
-
-            <div class="right">
-                {{ $slot }}
-            </div>
-        </div>
-
+        {{ $slot }}
     </section>
 
-
-
-
-    <footer id="main-footer" class="bg-light" onmouseover="closeCity(event, 'Paris')">
-
-        <p>Copyright &copy;<?php echo date('Y'); ?>, Postgraduate College, All Rights Reserved</p>
+    <footer id="main-footer" class="bg-light">
+        <p>Copyright &copy; {{ date('Y') }}, Postgraduate College, All Rights Reserved</p>
     </footer>
-
-
 </body>
 
 </html>

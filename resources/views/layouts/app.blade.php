@@ -79,7 +79,7 @@
                     <div class="d-flex user position-relative" data-bs-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                         <img class="profile" alt="profile" src="{{ asset('img/profile-11.webp') }}" />
-                        <div class="name">{{ session('user')->Surname }} {{ session('user')->Other_names }}
+                        <div class="name">{{ session('user')->Surname }} {{ session('user')->Othernames }}
                             <div class="card-body h-100">
                                 {{-- <h1>Welcome </h1> --}}
                                 <p>{{ session('user')->email }}</p>
@@ -106,14 +106,14 @@
                             </a>
                             
                         </li>
-                        @if ($zmain->isEmpty())
+                        
                         <li>
                             <a href="{{ route('dashboard.create') }}" data-href="#">
                                 <i data-acorn-icon="screen" class="icon" data-acorn-size="18"></i>
-                                <span class="label">Apply</span>
+                                <span class="label">Apply New</span>
                             </a>
                         </li>
-                        @endif
+                        
 
                         <li>
                             <a href="{{ URL('cart') }}">

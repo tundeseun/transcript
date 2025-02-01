@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Authenticate;
 use App\Models\NewStudent;
-use App\Models\PrevApp;
+use App\Models\TransDetailsNew;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,31 +28,29 @@ class LoginController extends Controller
  */
 public function store(Request $request)
 {
-    $matric = $request->input('matric');
-    $password = $request->input('password');
+    // Validate inputs
+    $request->validate([
+        'matric' => 'required|string',
+        'password' => 'required|string',
+    ]);
 
-    $authenticate = User::where('matric', $matric)->first();
+    $credentials = $request->only('matric', 'password');
 
-    if ($authenticate) {
-        $prevApp = PrevApp::where('matric', $matric)->first();
+    // Attempt to authenticate
+    if (Auth::attempt($credentials)) {
+        $user = User::where('matric', $credentials['matric'])->first();
+// dd($user);
+        // Store user data in the session
+        Session::put('user', $user ? $user : null);
+        Session::put('matric', $credentials['matric']);
 
-        if ($prevApp) {
-            $user = NewStudent::find($prevApp->user_id);
-
-            if (Auth::attempt($request->only(['matric', 'password']))) {
-                Session::put('user', $user);
-                Session::put('matric', $matric); 
-                return redirect()->route('dashboard');
-            }
-
-            return back()->withErrors(['message' => 'User not found'])->withInput();
-        } else {
-            return back()->withErrors(['message' => 'User not found'])->withInput();
-        }
-    } else {
-        return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
+        return redirect()->route('dashboard');
     }
+
+    // Authentication failed
+    return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
 }
+
 
 
     /**

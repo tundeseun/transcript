@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Cart;
-use App\Models\PrevApp;
+use App\Models\TransDetailsNew;
 use App\Models\ZmainApp;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
@@ -23,27 +23,38 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot()
-{
-    View::composer('*', function ($view) {
-        if (request()->path() !== '/') {            
-            $user = Auth::user();
-            $matric = $user->matric;
-            $prevApp = PrevApp::where('matric', $matric)->first();
-            if (!$prevApp) {
-                return response()->json(['error' => 'User not found in prev_app table.'], 404);
+    {
+        View::composer('*', function ($view) {
+            if (request()->path() !== '/') {
+                $user = Auth::user();
+                
+                // Check if the user is authenticated
+                if ($user) {
+                    $matric = $user->matric;
+    
+                    // Retrieve the cart items and transaction details based on the matric
+                    $cartItems = Cart::where('matric', $matric)->get();
+                    $cartItemCount = $cartItems->count();
+                    $transDetails = TransDetailsNew::where('matric', $matric)->get();
+                    $transDetailsExists = TransDetailsNew::where('matric', $matric)->exists();
+    
+                    // Pass the data to the view
+                    $view->with([
+                        'cartItemCount' => $cartItemCount,
+                        'transDetails' => $transDetails,
+                        'transDetailsExists' => $transDetailsExists,
+                    ]);
+                } else {
+                    // Optionally, handle the case when no user is authenticated
+                    $view->with([
+                        'cartItemCount' => 0,
+                        'transDetails' => null,
+                        'transDetailsExists' => false,
+                    ]);
+                }
             }
-            $user_id = $prevApp->user_id;
-
-            $cartItems = Cart::where('matric', $matric)->get();
-            $cartItemCount = $cartItems->count();
-            $zmain = ZmainApp::where('user_id', $user_id)->get('user_id');
-
-            $view->with([
-                'cartItemCount' => $cartItemCount,
-                'zmain' => $zmain,
-            ]);
-        }
-    });
-}
+        });
+    }
+    
 
 }

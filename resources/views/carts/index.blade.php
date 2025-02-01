@@ -54,12 +54,12 @@
 
                 </div>
 
-                @if ($cartItems->isNotEmpty() && $zmain->isEmpty())
+                @if ($cartItems->isNotEmpty() && $transDetails->isEmpty())
                     <div class="col-6 col-md-3">
 
                         <a href="{{ route('dashboard.create') }}" class="btn btn-primary">Add More Items</a>
                     </div>
-                @elseif ($cartItems->isNotEmpty() && $zmain->isNotEmpty())
+                @elseif ($cartItems->isNotEmpty() && $transDetails->isNotEmpty())
                     <div class="col-6 col-md-3">
 
                         <a href="{{ route('dashboard') }}" class="btn btn-primary">Add More Items</a>
@@ -82,7 +82,7 @@
 
                         <div class="card cardEmpty mb-2">
                             <p class="empty">Your Cart is Empty</p>
-                            @if ($zmain->isEmpty())
+                            @if ($transDetails->isEmpty())
                             <a class="btn btn-center btn-icon btn-icon-end btn-primary width-10"
                                 href="{{ route('dashboard.create') }}">
                                 <span>Apply Now!</span>

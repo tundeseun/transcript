@@ -338,23 +338,18 @@
                                         <div class="col form-group">
                                             <label for="file"><strong>Please Upload Notification of Result or
                                                     Certificate</strong></label>
-                                            @php
-                                                $notify = DB::table('notify')
-                                                    ->where('matric', session('user')->matric)
-                                                    ->first();
-                                            @endphp
-                                            @if ($notify)
-                                                <input type="text" class="form-control"
-                                                    value="{{ $notify->Notification_Document }}" readonly>
-                                            @else
-                                                <input type="file" id="file" name="file" required
-                                                    class="form-control">
-                                            @endif
+                                            <input type="file" id="file" name="file" required
+                                                class="form-control">
+
                                         </div>
 
                                     </div>
 
-                                    <button class="btn btn-primary" type="submit">Add to Cart</button>
+                                    <div class="mt-0 col d-flex justify-content-center">
+                                        <button class="btn btn-primary mt-4 w-full w-50" type="submit"
+                                            id="addToCart">Add to
+                                            Cart</button>
+                                    </div>
                             </form>
                     </div>
 

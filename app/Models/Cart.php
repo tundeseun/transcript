@@ -10,6 +10,6 @@ class Cart extends Model
     use HasFactory;
     protected $table = 'cart';
     protected $fillable = [
-        'matric','request','request_type','num_copies','fee',
+        'matric','request','degree','num_copies','fee',
     ];
 }

@@ -36,13 +36,14 @@
         <!-- Content Start -->
         <div class="card mb-2">
             <div class="card-body h-100">
-                Welcome <h1> {{ session('user')->Surname }} {{ session('user')->Other_names }}
+                {{-- @dd(session('user')); --}}
+                Welcome <h1> {{ session('user')->Surname  }} {{ session('user')->Othernames }}
                 </h1>
             </div>
         </div>
         <!-- Content End -->
         <div class="card mb-2 w-100">
-            @if ($zmain->isEmpty())
+            @if ($transDetails->isEmpty())
                 <div class="card cardEmpty mb-2">
                     <p class="empty">No Record found</p>
 
@@ -56,11 +57,11 @@
                 <div class="card-body h-100 w-100">
                     <div class="program">
                         <h1 class="mb-0 pb-0 display-4" id="title">Programme Details</h1>
-                        {{-- <a class="btn btn-center btn-icon btn-icon-end btn-primary w-20"
+                        <a class="btn btn-center btn-icon btn-icon-end btn-primary w-20"
                             href="{{ route('dashboard.create') }}">
                             <span>Apply for Another Program</span>
                             <i data-acorn-icon="chevron-right"></i>
-                        </a> --}}
+                        </a>
 
                     </div>
                     <br>
@@ -81,13 +82,12 @@
                                     @foreach ($users as $index => $user)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $user->faculty_name }}</td>
-                                            <td>{{ $user->department_name }}</td>
-                                            <td>{{ $user->degree_name }}</td>
-                                            <td>{{ $user->specialization_name }}</td>
+                                            <td>{{ $user->faculty }}</td>
+                                            <td>{{ $user->department }}</td>
+                                            <td>{{ $user->degree }}</td>
+                                            <td>{{ $user->feildofinterest }}</td>
                                             <td>
-                                                <a href="{{ route('dashboard.apply') }}" class="btn btn-info">Apply</a>
-                                            </td>
+                                                <a href="{{ route('dashboard.create', ['faculty' => $user->faculty, 'department' => $user->department, 'degree' => $user->degree, 'field' => $user->feildofinterest]) }}" class="btn btn-info">Apply</a>                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
