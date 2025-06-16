@@ -9,6 +9,8 @@ class ResultOld extends Model
 {
     use HasFactory;
     protected $table = 'result_old';
+    protected $fillable = ['matno', 'code', 'status', 'score', 'WA', 'sec', 'dept'];
+    public $timestamps = false;
 
     public function course()
     {

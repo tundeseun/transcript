@@ -5,17 +5,72 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Models\TransDetailsNew;
+use App\Models\TransDetailsFiles;
 use App\Models\AdminUser;
+
 class AdminLoginController extends Controller
 {
     public function index()
     {
-        return view('admin.index'); // Ensures it loads the admin layout
+        return view('admin.index');
     }
 
     public function store(Request $request)
 {
-    // Validate inputs
+    $request->validate([
+        'username' => 'required|string',
+        'password' => 'required|string',
+    ]);
+
+    $credential = $request->only('username', 'password');
+
+    if (Auth::guard('admin')->attempt($credential)) {
+        $user = AdminUser::where('username', $credential['username'])->first();
+
+        $records = TransDetailsNew::where('status', '>', 0)
+            ->whereRaw('email REGEXP "^[0-9]+$"')
+            ->whereHas('transInvoice', function ($query) {
+                $query->whereColumn('amount_charge', 'amount_paid');
+            })
+            ->with([
+                'transInvoice' => function ($query) {
+                    $query->select('invoiceno', 'purpose', 'dy', 'mth', 'cheque');
+                }
+            ])
+            ->get();
+
+        Session::put('admin_user', $user);
+        Session::put('admin_username', $user->username);
+        Session::put('records', $records); // Store records in session
+        Log::error($records);
+
+        switch ($user->role) {
+            case 7:
+                return redirect()->route('admin.recordProcesseds');
+            case 2:
+                return redirect()->route('admin.dashboard.to');
+            case 3:
+                return redirect()->route('admin.dashboard.ki');
+            case 4:
+                return redirect()->route('admin.dashboard_po');
+            case 5:
+                return redirect()->route('admin.dashboard.fo');
+            case 6:
+                return redirect()->route('admin.transrecevedashboard');
+            default:
+                Log::error('Unauthorized role for username: ' . $user->username . ' Role: ' . $user->role);
+                return redirect('admin/login')->withErrors(['login_error' => 'Unauthorized role.']);
+        }
+    }
+
+    return back()->withErrors(['login_error' => 'Invalid Username or Password'])->withInput();
+}
+
+    public function dashboard(Request $request)
+{
     $request->validate([
         'username' => 'required|string',
         'password' => 'required|string',
@@ -23,27 +78,78 @@ class AdminLoginController extends Controller
 
     $credentials = $request->only('username', 'password');
 
-    // Use the 'admin_users' guard for authentication
     if (Auth::guard('admin')->attempt($credentials)) {
         $user = AdminUser::where('username', $credentials['username'])->first();
 
-        // Store user data in the session
-        Session::put('admin_user', $user ? $user : null);
-        Session::put('admin_username', $credentials['username']);
+        $records = TransDetailsNew::where('status', '>', 0)
+            ->whereRaw('email REGEXP "^[0-9]+$"')
+            ->whereHas('transInvoice', function ($query) {
+                $query->whereColumn('amount_charge', 'amount_paid');
+            })
+            ->with([
+                'transInvoice' => function ($query) {
+                    $query->select('invoiceno', 'purpose', 'dy', 'mth', 'cheque');
+                }
+            ])
+            ->get();
 
-        return redirect()->route('admin.dashboard');
+        Session::put('admin_user', $user);
+        Session::put('admin_username', $user->username);
+
+        return view('admin.dashboard', ['records' => $records]);
     }
 
-    // Authentication failed
-    return back()->withErrors(['message' => 'Invalid Username or Password'])->withInput();
+    // Optional: return back with error if login fails
+    return back()->withErrors([
+        'username' => 'Invalid credentials provided.',
+    ]);
 }
 
-public function destroy()
+public function recordProcesseds()
 {
-    Auth::logout();
-    Session::forget('admin_user');
-    Session::forget('admin_username');
-    return redirect()->route('admin.login');
+    $records = session('records');
+    return view('admin.recordProcessed', compact('records'));
+}
+public function dashboardto()
+{
+    $records = session('records');
+    return view('admin.dashboardto', compact('records'));
 }
 
+public function dashboardKi()
+{
+    $records = session('records');
+    return view('admin.dashboard_ki', compact('records'));
+}
+
+public function dashboardPo()
+{
+    $records = session('records');
+    return view('admin.dashboard_po', compact('records'));
+}
+
+public function dashboardFo()
+{
+    $records = session('records');
+    return view('admin.dashboard_fo', compact('records'));
+}
+
+public function dashboardHd()
+{
+    $records = session('records');
+    return view('admin.dashboard_hd', compact('records'));
+}
+
+public function transreceiveDashboard()
+{
+    $records = session('records');
+    return view('admin.transrecevedashboard', compact('records'));
+}
+
+    public function destroy()
+    {
+        Session::forget('admin_user');
+        Session::forget('admin_username');
+        return redirect()->route('admin.login');
+    }
 }

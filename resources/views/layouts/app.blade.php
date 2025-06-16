@@ -104,16 +104,16 @@
                                 <i data-acorn-icon="home" class="icon" data-acorn-size="18"></i>
                                 <span class="label">Dashboards</span>
                             </a>
-                            
+
                         </li>
-                        
+
                         <li>
                             <a href="{{ route('dashboard.create') }}" data-href="#">
                                 <i data-acorn-icon="screen" class="icon" data-acorn-size="18"></i>
                                 <span class="label">Apply New</span>
                             </a>
                         </li>
-                        
+
 
                         <li>
                             <a href="{{ URL('cart') }}">
@@ -130,7 +130,7 @@
                             </a>
 
                         </li>
-                        
+
 
                     </ul>
                 </div>
@@ -205,7 +205,7 @@
 
                     <form method="post" action="{{ route('logout') }}" class="nav-link">
                         @csrf
-                        
+
 
 
 
@@ -228,7 +228,7 @@
             {{ $slot }}
         </main>
 
-        <!-- Footer Start -->       
+        <!-- Footer Start -->
         {{-- <footer class="footer">
             <div class="container-fluid">
                 <div class="row">

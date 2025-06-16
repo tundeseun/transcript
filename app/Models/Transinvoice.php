@@ -11,6 +11,6 @@ class Transinvoice extends Model
     protected $table = 'transinvoice';
     public $timestamps = false;
     protected $fillable = [
-        'appno','invoiceno','purpose','mth','dy','yr','amount_charge','amount_paid',
+        'appno','invoiceno','purpose','mth','dy','yr','amount_charge','amount_paid','cheque'
     ];
 }

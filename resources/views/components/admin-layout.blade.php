@@ -63,7 +63,7 @@
 
 <body>
     <div id="root">
-     
+
 
         <div id="nav" class="nav-container d-flex">
             <div class="nav-content d-flex">
@@ -111,11 +111,11 @@
                                 <i data-acorn-icon="home" class="icon" data-acorn-size="18"></i>
                                 <span class="label">Dashboards</span>
                             </a>
-                            
+
                         </li>
-                        
+
                         <li>
-                            <a href="{{ route('admin.recordProcessed') }}" data-href="#">
+                            <a href="{{ route('admin.recordProcesseds') }}" data-href="#">
                                 <i data-acorn-icon="screen" class="icon" data-acorn-size="18"></i>
                                 <span class="label">Processed Record</span>
                             </a>
@@ -126,8 +126,8 @@
                                 <span class="label">Approved Record</span>
                             </a>
                         </li>
-                       
-                        
+
+
 
                     </ul>
                 </div>
@@ -194,9 +194,9 @@
                 <li class="nav-item dropdown no-arrow">
 
 
-                    <form method="post" action="{{ route('admin.logout') }}" class="nav-link">
+                    <form method="post" action="" class="nav-link">
                         @csrf
-                        
+
 
 
 
@@ -219,7 +219,7 @@
             {{ $slot }}
         </main>
 
-        <!-- Footer Start -->       
+        <!-- Footer Start -->
         {{-- <footer class="footer">
             <div class="container-fluid">
                 <div class="row">

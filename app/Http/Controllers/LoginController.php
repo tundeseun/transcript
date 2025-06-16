@@ -35,7 +35,6 @@ public function store(Request $request)
     ]);
 
     $credentials = $request->only('matric', 'password');
-
     // Attempt to authenticate
     if (Auth::attempt($credentials)) {
         $user = User::where('matric', $credentials['matric'])->first();
@@ -44,8 +43,11 @@ public function store(Request $request)
         Session::put('user', $user ? $user : null);
         Session::put('matric', $credentials['matric']);
 
+
         return redirect()->route('dashboard');
     }
+
+
 
     // Authentication failed
     return back()->withErrors(['message' => 'Invalid Matric or Password'])->withInput();
@@ -56,7 +58,7 @@ public function store(Request $request)
     /**
      * Store a newly created resource in storage.
      */
-    
+
 
     /**
      * Remove the specified resource from storage.

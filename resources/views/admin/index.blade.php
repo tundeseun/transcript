@@ -1,6 +1,6 @@
 <x-guest-layout :title="'Transcript Application | Login Page'">
     <div class="flex items-center justify-center">
-   
+
     <div class="box lr">
 
 
@@ -20,7 +20,7 @@
                         {{ $message }}
                     </div>
                 @enderror
-                <form method="post" action="{{ route('admin.login.store') }}">
+                <form method="post" action="{{ route('login.store') }}">
                     @csrf
                     <div class="form-group">
                         <label for="username">Username:</label>
@@ -30,7 +30,7 @@
                         <label for="password">Password:</label>
                         <input type="password" placeholder="Password" name="password" required>
                     </div>
-        
+
                     <input type="submit" value="Sign in" name="send" class="btn">
                 </form>
                 <p class="noacc">
@@ -40,5 +40,5 @@
         </div>
     </div>
     </div>
-    
+
 </x-guest-layout>

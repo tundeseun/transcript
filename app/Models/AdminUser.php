@@ -23,10 +23,12 @@ class AdminUser extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        'fullname',
         'name',
         'username',
         'password',
         'role',
+        'status',
     ];
 
     /**

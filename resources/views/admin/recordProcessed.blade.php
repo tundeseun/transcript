@@ -126,7 +126,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-    
+
 
 
         <div class="card mb-2 w-100">
@@ -159,6 +159,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($records as $index => $record)
+                                    @if ($record->status == 7)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $record->matric }}</td>
@@ -183,7 +184,7 @@
                                                         Transcript
                                                     </button>
 
-                                                    
+
                                                     <button class="btn btn-success btn-sm"
                                                         data-matric="{{ $record->matric }}"
                                                         data-sessionadmin="{{ $record->sessionadmin }}"
@@ -200,6 +201,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -262,7 +264,7 @@
                 </div>
 
 
-              
+
 
 
                 <script>

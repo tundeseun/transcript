@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Cart; 
+use App\Models\Cart;
 use App\Models\NewRecord;
 use App\Models\PrevApp;
 use App\Models\RequestType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\TransDetailsNew;
+
 
 class CartController extends Controller
 {
@@ -18,19 +20,21 @@ class CartController extends Controller
         $user = Auth::user();
         $matric = $user->matric;
 
-        $prevApp = PrevApp::where('matric', $matric)->first();
-        if (!$prevApp) {
-            return response()->json(['error' => 'User not found in prev_app table.'], 404);
-        }
-        $newRecord = NewRecord::find($prevApp->user_id);
+        // $prevApp = PrevApp::where('matric', $matric)->first();
+        // if (!$prevApp) {
+        //     return response()->json(['error' => 'User not found in prev_app table.'], 404);
+        // }
+        // $newRecord = NewRecord::find($prevApp->user_id);
 
-        if (!$newRecord) {
-            return response()->json(['error' => 'User not found in new table.'], 404);
-        }
+        // if (!$newRecord) {
+        //     return response()->json(['error' => 'User not found in new table.'], 404);
+        // }
+
+        $newRecord = TransDetailsNew::where('matric', $matric)->first();
         $fullName = $newRecord->Surname . ' ' . $newRecord->Other_names;
 
         $cartItems = Cart::where('matric', $user->matric)->get();
-        
+
 
         $cartItemCount = $cartItems->count();
 
@@ -85,20 +89,20 @@ class CartController extends Controller
          // Retrieve the cart item by ID
          $cartItem = Cart::find($id);
 
-        
+
          if (!$cartItem) {
              return redirect()->route('cart.index')->with('error', 'Cart item not found.');
          }
- 
-       
+
+
          if ($cartItem->matric_number !== Auth::user()->matric_number) {
              return redirect()->route('cart.index')->with('error', 'Unauthorized action.');
          }
- 
-     
+
+
          $cartItem->delete();
- 
+
          return redirect()->route('cart.index')->with('success', 'Cart item deleted successfully.');
-     
+
     }
 }

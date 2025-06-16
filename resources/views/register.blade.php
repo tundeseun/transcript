@@ -114,7 +114,7 @@ ob_start();
     #formr label {
       color: #0a2b4f;
       display: block;
-      
+
     }
 
     .bold {
@@ -168,7 +168,7 @@ ob_start();
     .right #formr {
       display: flex;
       flex-direction: column;
-     
+
 
     }
 
@@ -212,7 +212,7 @@ ob_start();
 
     li {
       list-style: square !important;
-      
+
     }
 
     .reg {
@@ -226,12 +226,12 @@ ob_start();
     }
     #formr form .twoform {
       display: flex;
-      
-    
+
+
     }
     #formr form .twoform input{
       width: 310px !important;
-    
+
     }
     @media (max-width:950px){
       #formr form .twoform{
@@ -242,12 +242,12 @@ ob_start();
     }
     #formr form .twoform input{
       width: 100% !important;
-    
+
     }
-   
+
 }
     @media (max-width:550px){
-    
+
     #navchecker .h3{
       font-size: 1.3rem;
     }
@@ -265,7 +265,7 @@ ob_start();
   width: 100%;
   font-size: 1rem;
   border: 1px solid #0a2b4f;
-  
+
 
 }
   </style>
@@ -299,12 +299,12 @@ ob_start();
       <div class="left">
         <p class="noacc">
           If you have an account already, click
-          <a class="reg" href="login.php">Sign In.</a>
+          <a class="reg" href="/">Sign In.</a>
         </p>
-        <div class="">
+        {{-- <div class="">
           <p class="head">Instruction:</p>
-        </div>
-        <ul class="mb-1">
+        </div> --}}
+        {{-- <ul class="mb-1">
           <li>
 
             Institutional (not personal/ individual) email address is to be submitted for official transcripts.
@@ -321,57 +321,76 @@ ob_start();
 
           </li>
 
-        </ul>
+        </ul> --}}
 
 
 
       </div>
 
-      <div class="right">
-        <div id="formr">
-          <form method="post">
-          <div class="form-group">
-              <label for="matric">Matriculation Number:</label>
-              <input type="number" placeholder="Matriculation Number" name="matric">
+     <!-- resources/views/authenticate/create.blade.php -->
+
+<div class="right">
+    <div id="formr">
+        @if(session('success'))
+            <div style="color: green; margin-bottom: 10px;">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div style="color: red; margin-bottom: 10px;">
+                <ul>
+                    @foreach($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <div class="twoform">
-            <div class="form-group mr">
-              <label for="Surname">Surname:</label>
-              <input type="text" placeholder="Surname" name="Surname" id="Surname">
-            </div>
+        @endif
+
+        <form method="POST" action="{{ route('authenticate.store') }}">
+            @csrf
+
             <div class="form-group">
-              <label for="othername">Other Names:</label>
-              <input type="text" placeholder="Other Names" name="othername" id="othername">
-            </div>
-            </div>
-            <div class="twoform">
-            <div class="form-group mr">
-              <label for="phone">Phone Number:</label>
-              <input type="number" placeholder="Phone Number" name="phone" id="phone">
-            </div>
-            <div class="form-group">
-              <label for="email">Email Address:</label>
-              <input type="email" placeholder="Email Address" name="email" id="email">
-            </div>
-            </div>
-            <div class="twoform">
-            <div class="form-group mr">
-              <label for="password">Password:</label>
-              <input type="password" placeholder="Password" name="password" id="password">
-            </div>
-            <div class="form-group">
-              <label for="passwordc">Confirm Password:</label>
-              <input type="password" placeholder="Confirm Password" name="passwordc" id="passwordc">
-            </div>
-            
+                <label for="matric">Matriculation Number:</label>
+                <input type="number" placeholder="Matriculation Number" name="matric" value="{{ old('matric') }}">
             </div>
 
-            <input type='submit' value='Sign Up' name='send' class='btn'>
-          </form>
+            <div class="twoform">
+                <div class="form-group mr">
+                    <label for="Surname">Surname:</label>
+                    <input type="text" placeholder="Surname" name="Surname" id="Surname" value="{{ old('Surname') }}">
+                </div>
+                <div class="form-group">
+                    <label for="othername">Other Names:</label>
+                    <input type="text" placeholder="Other Names" name="othername" id="othername" value="{{ old('othername') }}">
+                </div>
+            </div>
 
-        </div>
-      </div>
+            <div class="twoform">
+                <div class="form-group mr">
+                    <label for="phone">Phone Number:</label>
+                    <input type="number" placeholder="Phone Number" name="phone" id="phone" value="{{ old('phone') }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" placeholder="Email Address" name="email" id="email" value="{{ old('email') }}">
+                </div>
+            </div>
+
+            <div class="twoform">
+                <div class="form-group mr">
+                    <label for="password">Password:</label>
+                    <input type="password" placeholder="Password" name="password" id="password">
+                </div>
+                <div class="form-group">
+                    <label for="password_confirmation">Confirm Password:</label>
+                    <input type="password" placeholder="Confirm Password" name="password_confirmation" id="password_confirmation">
+                </div>
+            </div>
+
+            <input type='submit' value='Sign Up' class='btn'>
+        </form>
     </div>
+</div>
+
 
   </section>
 

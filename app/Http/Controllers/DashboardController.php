@@ -32,6 +32,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Unauthorized access');
+        }
         $matric = session('matric');
 
         $users = TransDetailsNew::where('matric', $matric)
@@ -39,6 +42,8 @@ class DashboardController extends Controller
             ->select('faculty', 'department', 'degree', 'feildofinterest')
             ->distinct()
             ->get();
+
+
 
 
         return view('dashboard', ['users' => $users]);
@@ -81,6 +86,131 @@ class DashboardController extends Controller
         $requestTypes = RequestType::all();
         return view('apply2', compact('requestTypes'));
     }
+
+    // public function store(Request $request)
+    // {
+    //     if (!auth()->check()) {
+    //         return redirect()->route('login')->with('error', 'Unauthorized access');
+    //     }
+
+    //     $matric = auth()->user()->matric;
+
+    //     $user = User::where('matric', $matric)->first();
+
+    //     $validatedData = $request->validate([
+    //         'transcript_type' => 'required',
+    //         'number_of_copies' => 'required|numeric|min:1',
+    //         'faculty' => 'sometimes|required',
+    //         'department' => 'sometimes|required',
+    //         'degree' => 'sometimes|required',
+    //         'field' => 'sometimes|required',
+    //         'title' => 'sometimes|required',
+    //         'sex' => 'sometimes|required',
+    //         'surname' => 'sometimes|required',
+    //         'othernames' => 'sometimes|required',
+    //         'maiden' => 'sometimes',
+    //         'session_of_entry' => 'sometimes|required',
+    //         'session_of_graduation' => 'sometimes|required',
+    //         'file' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+    //     ]);
+
+    //     $fac = FacNew::where('id', $validatedData['faculty'])
+    //         ->orWhere('faculty', $validatedData['faculty'])
+    //         ->first();
+
+    //     if (!$fac) {
+    //         return redirect()->back()->with('error', 'Faculty not found');
+    //     }
+
+    //     $dept = DeptNew::where('id', $validatedData['department'])
+    //         ->orWhere('department', $validatedData['department'])
+    //         ->first();
+
+    //     if (!$dept) {
+    //         return redirect()->back()->with('error', 'Department not found');
+    //     }
+
+    //     $degrees = DegreeNew::where('id', $validatedData['degree'])
+    //         ->orWhere('degree', $validatedData['degree'])
+    //         ->first();
+
+    //     if (!$degrees) {
+    //         return redirect()->back()->with('error', 'Degree not found');
+    //     }
+
+    //     $specializations = FieldNew::where('id', $validatedData['field'])
+    //         ->orWhere('field_title', $validatedData['field'])
+    //         ->first();
+
+    //     if (!$specializations) {
+    //         return redirect()->back()->with('error', 'Specialization not found');
+    //     }
+
+    //     $facName = $fac->faculty;
+    //     $deptName = $dept->department;
+    //     $degreeName = $degrees->degree;
+    //     $specializationName = $specializations->field_title;
+
+
+
+
+    //     $transcriptAmount = RequestType::where('requesttype', $request->transcript_type)->first();
+    //     if (!$transcriptAmount) {
+    //         return redirect()->back()->with('error', 'Invalid transcript type');
+    //     }
+
+    //     $cartItem = [
+    //         'matric' => $matric,
+    //         'request' => $validatedData["transcript_type"],
+    //         'num_copies' => $validatedData["number_of_copies"],
+    //         'fee' => $transcriptAmount['amount'],
+    //         'degree' => $degreeName,
+    //     ];
+
+    //     Cart::create($cartItem);
+
+    //     // Prepare the data for storage
+    //     $transDetailsItems = [
+    //         'matric' => $matric, // Ensure this is provided in the request
+    //         'Surname' => $validatedData['surname'],
+    //         'Othernames' => $validatedData['othernames'],
+    //         'maiden' => $validatedData['maiden'] ?? '',
+    //         'sex' => $validatedData['sex'],
+    //         'tittle' => $validatedData['title'], // Make sure 'tittle' matches your database column name
+    //         'degree' => $degreeName,
+    //         'sessionadmin' => $validatedData['session_of_entry'], // Rename as necessary
+    //         'sessiongrad' => $validatedData['session_of_graduation'], // Duplicate key corrected below
+    //         'faculty' => $facName,
+    //         'department' => $deptName,
+    //         'feildofinterest' => $specializationName,
+    //         'award' => null,
+    //         'programme' => null,
+    //         'date_requested' => now(),
+    //     ];
+
+
+    //     // Store the data
+    //     $transDetails = TransDetailsNew::create($transDetailsItems);
+
+    //     // Store uploaded file path separately
+    //     if ($request->hasFile('file')) {
+    //         $file = $request->file('file');
+    //         $filePath = $file->store('uploads/notification', 'public');
+
+    //         TransDetailsFiles::create([
+    //             'trans_details_id' => $transDetails->id,
+    //             'file_path' => $filePath,
+    //         ]);
+    //     } else {
+    //         return redirect()->back()->with('error', 'File Upload Failed');
+    //     }
+
+
+    //     session()->push('cart', $cartItem);
+
+    //     return redirect()->to('cart');
+    // }
+
 
     public function store(Request $request)
     {
@@ -146,9 +276,6 @@ class DashboardController extends Controller
         $degreeName = $degrees->degree;
         $specializationName = $specializations->field_title;
 
-
-
-
         $transcriptAmount = RequestType::where('requesttype', $request->transcript_type)->first();
         if (!$transcriptAmount) {
             return redirect()->back()->with('error', 'Invalid transcript type');
@@ -164,25 +291,47 @@ class DashboardController extends Controller
 
         Cart::create($cartItem);
 
+        // Check if matric and department exist with status = 8
+        // $existingStatus8 = TransDetailsNew::where('matric', $matric)
+        //     ->where('department', $deptName)
+        //     ->where('status', 8)
+        //     ->exists();
+
+        // Check if matric matches results.stud_id or result_old.appno
+$matchExists = DB::table('results')
+->where('stud_id', $matric)
+->exists();
+
+if (!$matchExists) {
+$matchExists = DB::table('result_old')
+    ->where('matno', $matric)
+    ->exists();
+}
+
+// Update status in TransDetailsNew based on the match
+$statusToInsert = $matchExists ? 2 : 0;
+
+        // $statusToInsert = $existingStatus8 ? 2 : 0;
+
         // Prepare the data for storage
         $transDetailsItems = [
-            'matric' => $matric, // Ensure this is provided in the request
+            'matric' => $matric,
             'Surname' => $validatedData['surname'],
             'Othernames' => $validatedData['othernames'],
             'maiden' => $validatedData['maiden'] ?? '',
             'sex' => $validatedData['sex'],
-            'tittle' => $validatedData['title'], // Make sure 'tittle' matches your database column name
+            'tittle' => $validatedData['title'],
             'degree' => $degreeName,
-            'sessionadmin' => $validatedData['session_of_entry'], // Rename as necessary
-            'sessiongrad' => $validatedData['session_of_graduation'], // Duplicate key corrected below
+            'sessionadmin' => $validatedData['session_of_entry'],
+            'sessiongrad' => $validatedData['session_of_graduation'],
             'faculty' => $facName,
             'department' => $deptName,
             'feildofinterest' => $specializationName,
             'award' => null,
             'programme' => null,
             'date_requested' => now(),
+            'status' => $statusToInsert, // <-- Added status
         ];
-
 
         // Store the data
         $transDetails = TransDetailsNew::create($transDetailsItems);
@@ -200,11 +349,14 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'File Upload Failed');
         }
 
-
         session()->push('cart', $cartItem);
 
         return redirect()->to('cart');
     }
+
+
+
+
 
     public function adminDashboard()
     {
@@ -221,8 +373,134 @@ class DashboardController extends Controller
 
 
 
+
         return view('admin.dashboard', ['records' => $records]); // Adjust the view path as necessary
     }
+
+    public function transrecieveDashboard()
+    {
+
+        $records = TransDetailsNew::where('status', 2)
+            ->whereRaw('email REGEXP "^[0-9]+$"')
+            ->whereHas('transInvoice', function ($query) {
+                $query->whereColumn('amount_charge', 'amount_paid');
+            })->with([
+                    'transInvoice' => function ($query) {
+                        $query->select('invoiceno', 'purpose', 'dy', 'mth','cheque'); // Select only necessary fields
+                    }
+                ])
+            ->get();
+
+
+
+        return view('admin.transrecevedashboard', ['records' => $records]); // Adjust the view path as necessary
+    }
+
+
+
+    // public function transrecieveDashboard()
+    // {
+    //     $record = DB::table('trans_details_new')
+    //     ->join('transinvoice', 'transinvoice.appno', '=', 'trans_details_new.matric') // Exact join you want
+    //     ->where('trans_details_new.matric', $request->matric)
+    //     ->where('transinvoice.invoiceno', $request->invoiceno)
+    //     ->select('trans_details_new.id')
+    //     ->whereHas('transInvoice', function ($query) {
+    //         $query->whereColumn('amount_charge', 'amount_paid');
+    //     })->with([
+    //             'transInvoice' => function ($query) {
+    //                 $query->select('invoiceno', 'purpose', 'dy', 'mth','cheque'); // Select only necessary fields
+    //             }
+    //         ])
+    //     ->first();
+
+
+    //     return view('admin.transrecevedashboard', ['records' => $records]); // Adjust the view path as necessary
+    // }
+
+//     public function updateCheque(Request $request)
+// {
+//     // Validate the data
+//     $request->validate([
+//         'matric' => 'required',
+//         'invoiceno' => 'required',
+//         'cheque' => 'required|integer', // Corrected to 'cheque'
+//     ]);
+
+//     try {
+//         $updated = DB::table('trans_details_new')
+//             ->where('matric', $request->matric)
+//             ->where('invoiceno', $request->invoiceno)
+//             ->update(['status' => $request->cheque]);
+
+//         if ($updated) {
+//             return response()->json(['success' => true]);
+//         } else {
+//             return response()->json(['success' => false, 'message' => 'Record not found or no changes made']);
+//         }
+//     } catch (\Exception $e) {
+//         Log::error('Error updating cheque: ' . $e->getMessage());
+//         return response()->json(['success' => false, 'message' => 'Server error: ' . $e->getMessage()], 500);
+//     }
+// }
+
+
+public function updateCheque(Request $request)
+{
+    $request->validate([
+        'matric' => 'required',
+        'invoiceno' => 'required',
+        'cheque' => 'required|integer',
+    ]);
+
+    try {
+        // Find the specific trans_details_new record joined with transinvoice
+        // $record = DB::table('trans_details_new')
+        //     ->join('transinvoice', 'transinvoice.appno', '=', 'trans_details_new.matric')
+        //      ->join('result', 'result.sec', '=', 'trans_details_new.sessionadmin')
+        //     ->where('trans_details_new.matric', $request->matric)
+        //     ->where('transinvoice.invoiceno', $request->invoiceno)
+        //     ->select('trans_details_new.id')
+        //     ->first();
+
+$record = DB::table('trans_details_new')
+    ->join('transinvoice', 'transinvoice.appno', '=', 'trans_details_new.matric')
+    // ->join('results', function ($join) {
+    //     $join->on('results.stud_id', '=', 'trans_details_new.matric')
+    //          ->on('results.sec', '=', 'trans_details_new.sessionadmin');
+    // })
+    ->where('trans_details_new.matric', $request->matric)
+    ->where('transinvoice.invoiceno', $request->invoiceno)
+    ->select('trans_details_new.id')
+    ->first();
+
+        if ($record) {
+            $updated = DB::table('trans_details_new')
+                ->where('id', $record->id)
+                ->update(['status' => $request->cheque]);
+
+            return response()->json([
+                'success' => true,
+                'updated' => $updated,
+                'id' => $record->id
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No matching record found with provided matric and invoiceno'
+            ]);
+        }
+    } catch (\Exception $e) {
+        Log::error('Error updating status: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Server error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
     public function processRecord(Request $request)
     {
 
@@ -243,7 +521,7 @@ class DashboardController extends Controller
                 }
                 $normalizedSecAdmin = preg_replace('/\/20(\d{2})$/', '/$1', $sessionAdmin);
 
-                $transDetails = TransDetailsNew::where('matric', $matric)->first();
+                $transDetails = TransDetailsNew::where('matric', $matric)->where('sessionadmin', $sessionAdmin)->first();
                 Log::info('biodata: ' . $biodata);
                 Log::info('transDetails: ' . $transDetails);
                 $gender = $biodata->sex ?? $transDetails->sex ?? 'N/A';
@@ -263,8 +541,9 @@ class DashboardController extends Controller
 
                 if ($results->isEmpty()) {
                     // If Result2023 is empty, fallback to Result2018
-                    $biodata = Biodata::where('matric', $matric)->first();
-                    
+                    //$biodata = Biodata::where('matric', $matric)->first();
+                    $biodata = TransDetailsNew::where('matric', $matric)->where('sessionadmin', $sessionAdmin)->first();
+
 
                     // Try fetching from Result2018 first
                     $results = Result2018::with('course')
@@ -278,8 +557,9 @@ class DashboardController extends Controller
 
             } elseif ($startYear >= 2018 && $startYear <= 2022) {
                 // **2018/2019 and above: Use Result2018**
-                $biodata = Biodata::where('matric', $matric)->first();
-                
+                //$biodata = Biodata::where('matric', $matric)->first();
+                $biodata = TransDetailsNew::where('matric', $matric)->where('sessionadmin', $sessionAdmin)->first();
+
                 $results = Result2018::with('course')
                     ->where('stud_id', $matric)
                     ->where('sec', $sessionAdmin)
@@ -290,12 +570,12 @@ class DashboardController extends Controller
 
             } elseif ($startYear >= 2013 && $startYear <= 2017) {
                 // **2013/2014 to 2016/2017: Check Result2018 first, fallback to ResultOld**
-                $biodata = Biodata::where('matric', $matric)->first();
-                
+                $biodata = TransDetailsNew::where('matric', $matric)->where('sessionadmin', $sessionAdmin)->first();
+
                 $results = Result2018::where('stud_id', $matric)
-                    ->where('sec', $sessionAdmin)
-                    ->with('course')
-                    ->get();
+                ->where('sec', $sessionAdmin)
+                ->with('course')
+                ->get();
 
 
                 if ($results->isEmpty() || !$biodata) {
@@ -309,8 +589,12 @@ class DashboardController extends Controller
                         ->with('course')
                         ->get();
 
+
                     return view('admin.transcript_old', compact('records', 'results'));
                 }
+                Log::info('Biodata: ' . $biodata);
+                Log::info('result: ' . $results);
+
                 return view('admin.transcript', compact('biodata', 'results'));
 
 
@@ -358,6 +642,9 @@ class DashboardController extends Controller
             // Log::info("Results found: ", $results->toArray());
 
             // return view('admin.transcript', compact('biodata', 'results'));
+        }else{
+            Log::info('Not Match');
+
         }
 
 
@@ -490,7 +777,7 @@ class DashboardController extends Controller
         try {
             Log::info('Request Method: ' . $request->method());
             Log::info('Request Data:', $request->all());
-    
+
             // Validate input
             $request->validate([
                 'matric' => 'required',
@@ -498,27 +785,27 @@ class DashboardController extends Controller
                 'cgpa' => 'required|numeric|min:0|max:10',
                 'degreeAward' => 'required|string|max:255',
             ]);
-    
+
             // Normalize session admin value
             $normalizedSecAdmin = preg_replace('/\/(\d{2})$/', '/20$1', $request->secAdmin);
-    
+
             // Retrieve transcript record
             $transcript = TransDetailsNew::where('matric', $request->matric)
-                ->where('sessionadmin', $normalizedSecAdmin)
+                ->where('sessionadmin', $request->secAdmin)
                 ->first();
-    
+
             if (!$transcript) {
                 return back()->with('error', 'Transcript record not found.');
             }
-    
+
             // Update transcript record
             $transcript->update([
                 'award' => $request->cgpa,
                 'programme' => $request->degreeAward,
-                'status' => 1,
+                'status' => 7,
             ]);
-    
-            return redirect()->route('admin.dashboard')->with('success', 'Transcript submitted for approval.');
+
+            return redirect()->route('admin.dashboard.to')->with('success', 'Transcript submitted for approval.');
         } catch (\Exception $e) {
             Log::error('Error submitting transcript: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while submitting the transcript. Please try again.');
@@ -529,30 +816,31 @@ class DashboardController extends Controller
         try {
             Log::info('approve Request Method: ' . $request->method());
             Log::info('approve Request Data:', $request->all());
-    
+
             // Validate input
             $request->validate([
                 'matric' => 'required',
                 'sessionadmin' => 'required',
-                
+
             ]);
-    
-    
+
+
             // Retrieve transcript record
             $transcript = TransDetailsNew::where('matric', $request->matric)
                 ->where('sessionadmin', $request->sessionadmin)
+                ->where('status', 7)
                 ->first();
-    
+
             if (!$transcript) {
                 return back()->with('error', 'Transcript record not found.');
             }
-    
+
             // Update transcript record
             $transcript->update([
-                'status' => 2,
+                'status' => 8,
             ]);
-    
-            return redirect()->route('admin.recordProcessed')->with('success', 'Transcript Approved Successfully.');
+
+            return redirect()->route('admin.recordProcesseds')->with('success', 'Transcript Approved Successfully.');
         } catch (\Exception $e) {
             Log::error('Error submitting approve transcript: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while submitting the transcript. Please try again.');
@@ -563,41 +851,41 @@ class DashboardController extends Controller
         try {
             Log::info('reject Request Method: ' . $request->method());
             Log::info('reject Request Data:', $request->all());
-    
+
             // Validate input
             $request->validate([
                 'matric' => 'required',
                 'sessionadmin' => 'required',
-                
+
             ]);
-    
+
             // Normalize session admin value
-    
+
             // Retrieve transcript record
             $transcript = TransDetailsNew::where('matric', $request->matric)
                 ->where('sessionadmin', $request->sessionadmin)
                 ->first();
-    
+
             if (!$transcript) {
                 return back()->with('error', 'Transcript record not found.');
             }
-    
+
             // Update transcript record
             $transcript->update([
                 'status' => 0,
             ]);
-    
-            return redirect()->route('admin.recordProcessed')->with('success', 'Transcript Rejected Successfully.');
+
+            return redirect()->route('admin.recordProcesseds')->with('success', 'Transcript Rejected Successfully.');
         } catch (\Exception $e) {
             Log::error('Error submitting reject transcript: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while submitting the transcript. Please try again.');
         }
     }
-    
+
 
     public function recordProcessed()
     {
-        $records = TransDetailsNew::where('status', 1)
+        $records = TransDetailsNew::where('status', 7)
             ->whereRaw('email REGEXP "^[0-9]+$"')
             ->whereHas('transInvoice', function ($query) {
                 $query->whereColumn('amount_charge', 'amount_paid');
@@ -614,7 +902,7 @@ class DashboardController extends Controller
     }
     public function recordApproved()
     {
-        $records = TransDetailsNew::where('status', 2)
+        $records = TransDetailsNew::where('status', 8)
             ->whereRaw('email REGEXP "^[0-9]+$"')
             ->whereHas('transInvoice', function ($query) {
                 $query->whereColumn('amount_charge', 'amount_paid');
@@ -629,8 +917,8 @@ class DashboardController extends Controller
 
         return view('admin.recordApproved', ['records' => $records]); // Adjust the view path as necessary
     }
-    
-    
+
+
     public function show(string $id)
     {
         //

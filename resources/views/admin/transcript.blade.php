@@ -140,7 +140,7 @@
                 <div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <p><strong>Name:</strong>
+                        {{-- <p><strong>Name:</strong>
                             {{ $biodata->othername && $biodata->surname ? $biodata->othername . ' ' . $biodata->surname : $biodata->name }}
                         </p>
                         <p><strong>Gender:</strong> {{ $gender ??$biodata->sex}}</p>
@@ -150,7 +150,33 @@
                         <p><strong>Faculty:</strong>
                             {{ $biodata->faculty ?? ($results->first()->faculty->faculty ?? 'N/A') }}</p>
                         <p><strong>Department:</strong>
-                            {{ $biodata->department ?? ($results->first()->department->department ?? 'N/A') }}</p>
+                            {{ $biodata->department ?? ($results->first()->department->department ?? 'N/A') }}</p> --}}
+
+                            @if($biodata)
+    <p><strong>Name:</strong>
+        {{ $biodata->Othernames && $biodata->Surname ? $biodata->Othernames . ' ' . $biodata->Surname : ($biodata->name ?? 'N/A') }}
+    </p>
+    <p><strong>Gender:</strong> {{ $gender ?? $biodata->sex ?? 'N/A' }}</p>
+    <p><strong>Matric Number:</strong> {{ $biodata->matric ?? 'N/A' }}</p>
+    <p><strong>Session Admitted:</strong>
+        {{ $biodata->sessionadmin ?? ($results->first()->sec ?? 'N/A') }}
+    </p>
+    <p><strong>Faculty:</strong>
+        {{ $biodata->faculty ?? ($results->first()->faculty->faculty ?? 'N/A') }}
+    </p>
+    <p><strong>Department:</strong>
+        {{ $biodata->department ?? ($results->first()->department->department ?? 'N/A') }}
+    </p>
+@else
+    <p><strong>Name:</strong> N/A</p>
+    <p><strong>Gender:</strong> {{ $gender ?? 'N/A' }}</p>
+    <p><strong>Matric Number:</strong> N/A</p>
+    <p><strong>Session Admitted:</strong> {{ $results->first()->yr_of_entry ?? 'N/A' }}</p>
+    <p><strong>Faculty:</strong> {{ $results->first()->faculty->faculty ?? 'N/A' }}</p>
+    <p><strong>Department:</strong> {{ $results->first()->department->department ?? 'N/A' }}</p>
+@endif
+
+
                     </div>
 
                 </div>
@@ -195,16 +221,18 @@
                                     class="border  p-1 px-2 w-full rounded-md">
                             </div>
                             <div>
-                                <label class="font-semibold block">Date of Award:</label>
-                                <input type="text" name="awardDate"
-                                    value="{{ \Carbon\Carbon::parse($results->first()->effectivedate)->format('d F, Y') }}"
-                                    class="border p-1 px-2 w-full rounded-md" readonly>
+                               <label class="font-semibold block">Date of Award:</label>
+
+<input type="text" name="awardDate"
+    value="{{ optional($results->first())->effectivedate ? \Carbon\Carbon::parse($results->first()->effectivedate)->format('d F, Y') : 'N/A' }}"
+    class="border p-1 px-2 w-full rounded-md" readonly>
+
                             </div>
 
 
                         </div>
                         <p><strong>Area of Specialization:</strong>
-                            {{ $biodata->specialization ?? ($results->first()->specialization->field_title ?? 'N/A') }}
+                            {{ $biodata->feildofinterest ?? ($results->first()->specialization->field_title ?? 'N/A') }}
                         </p>
 
                     </div>
@@ -213,9 +241,13 @@
 
                 <form action="{{ route('admin.transcriptSubmit') }}" method="POST" onsubmit="return validateForm()">
                     @csrf
-                    <input type="hidden" name="matric" value="{{ $biodata->matric }}">
+                    @if($biodata)
+    <input type="hidden" name="matric" value="{{ $biodata->matric }}">
+@endif
+
                     <input type="hidden" name="secAdmin"
-                        value="{{ $biodata->yr_of_entry ? $biodata->yr_of_entry : $results->first()->yr_of_entry }}">
+    value="{{ optional($biodata)->sessionadmin ?? optional($results->first())->sec ?? '' }}">
+
                     <input type="hidden" name="cgpa" id="cgpaInput">
                     <input type="hidden" name="degreeAward" id="degreeAwardInput">
 

@@ -22,16 +22,16 @@ class TransinvoiceController extends Controller
         $user = Auth::user();
         $matric = $user->matric;
 
-        $prevApp = PrevApp::where('matric', $matric)->first();
-        if (!$prevApp) {
-            return response()->json(['error' => 'User not found in prev_app table.'], 404);
-        }
-        $newRecord = NewRecord::find($prevApp->user_id);
+        // $prevApp = PrevApp::where('matric', $matric)->first();
+        // if (!$prevApp) {
+        //     return response()->json(['error' => 'User not found in prev_app table.'], 404);
+        // }
+        $newRecord = TransDetailsNew::where('matric', $matric)->first();;
 
-        if (!$newRecord) {
-            return response()->json(['error' => 'User not found in new table.'], 404);
-        }
-        $fullName = $newRecord->Surname . ' ' . $newRecord->Other_names;
+        // if (!$newRecord) {
+        //     return response()->json(['error' => 'User not found in new table.'], 404);
+        // }
+        $fullName = $newRecord->Surname . ' ' . $newRecord->Othernames;
 
         $invoices = Transinvoice::where('appno', $matric)->orderby('id', 'desc')->get();
 
@@ -87,16 +87,18 @@ class TransinvoiceController extends Controller
         $user = Auth::user();
         $matric = $user->matric;
 
-        $prevApp = PrevApp::where('matric', $matric)->first();
-        if (!$prevApp) {
-            return response()->json(['error' => 'User not found in prev_app table.'], 404);
-        }
-        $newRecord = NewRecord::find($prevApp->user_id);
+        // $prevApp = PrevApp::where('matric', $matric)->first();
+        // if (!$prevApp) {
+        //     return response()->json(['error' => 'User not found in prev_app table.'], 404);
+        // }
+        // $newRecord = NewRecord::find($prevApp->user_id);
 
-        if (!$newRecord) {
-            return response()->json(['error' => 'User not found in new table.'], 404);
-        }
-        $fullName = $newRecord->Surname . ' ' . $newRecord->Other_names;
+        // if (!$newRecord) {
+        //     return response()->json(['error' => 'User not found in new table.'], 404);
+        // }
+
+        $newRecord = TransDetailsNew::where('matric', $matric)->first();;
+        $fullName = $newRecord->Surname . ' ' . $newRecord->Othernames;
         $invoice = Transinvoice::findOrFail($id);
 
         return view('invoices.invoice', compact('invoice', 'fullName'));
@@ -110,16 +112,17 @@ class TransinvoiceController extends Controller
         $user = Auth::user();
         $matric = $user->matric;
 
-        $prevApp = PrevApp::where('matric', $matric)->first();
-        if (!$prevApp) {
-            return response()->json(['error' => 'User not found in prev_app table.'], 404);
-        }
-        $newRecord = NewRecord::find($prevApp->user_id);
+        // $prevApp = PrevApp::where('matric', $matric)->first();
+        // if (!$prevApp) {
+        //     return response()->json(['error' => 'User not found in prev_app table.'], 404);
+        // }
+        // $newRecord = NewRecord::find($prevApp->user_id);
 
-        if (!$newRecord) {
-            return response()->json(['error' => 'User not found in new table.'], 404);
-        }
-        $fullName = $newRecord->Surname . ' ' . $newRecord->Other_names;
+        // if (!$newRecord) {
+        //     return response()->json(['error' => 'User not found in new table.'], 404);
+        // }
+        $newRecord = TransDetailsNew::where('matric', $matric)->first();;
+        $fullName = $newRecord->Surname . ' ' . $newRecord->Othernames;
         $invoice = Transinvoice::findOrFail($id);
         $requests = RequestType::all();
         return view('invoices.edit', compact('invoice', 'requests', 'fullName'));
